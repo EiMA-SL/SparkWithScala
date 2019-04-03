@@ -15,6 +15,10 @@ object ScalaExercise01 {
     ClicksPerUser(File)
     println("Number Of Clicks Per Product")
     ClicksPerProduct(File)
+    println("Number Of Clicks Per Product Category")
+    ClicksPerProductCategory(File)
+    println("Number Of Clicks Per Product Vs Channel")
+    ClicksPerProductVsChannel(File)
   }
 
 
@@ -34,10 +38,29 @@ object ScalaExercise01 {
   }
   def ClicksPerProduct(rdd :RDD[String]): Unit ={
 
+    val wordRdd = rdd.map(line => line.split(",")(2))
+    val wordPairRdd = wordRdd.map(word => (word, 1))
+
+    val wordCounts = wordPairRdd.reduceByKey((x, y) => x + y)
+    for ((word, count) <- wordCounts.collect()) println(word + " : " + count)
+
+  }
+  def ClicksPerProductCategory(rdd :RDD[String]): Unit ={
+
     val wordRdd = rdd.map(line => line.split(",")(1))
     val wordPairRdd = wordRdd.map(word => (word, 1))
 
     val wordCounts = wordPairRdd.reduceByKey((x, y) => x + y)
+    for ((word, count) <- wordCounts.collect()) println(word + " : " + count)
+
+  }
+
+  def ClicksPerProductVsChannel(rdd :RDD[String]): Unit ={
+
+    val wordRdd = rdd.map(line => (line.split(",")(2),(1,line.split(",")(3))))
+    //val wordPairRdd = wordRdd.map(word => (word, 1))
+
+    val wordCounts = wordRdd.reduceByKey((x, y) => (x._1 + y._1 , x._2 + y._2))
     for ((word, count) <- wordCounts.collect()) println(word + " : " + count)
 
   }
